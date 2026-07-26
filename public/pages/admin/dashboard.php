@@ -1,5 +1,6 @@
 <?php require __DIR__ . '/../../../includes/header.php';
 if (!is_admin_logged_in()){ header('Location:/admin/login'); exit; }
+if (!enforce_session_timeout()) { header('Location:/admin/login'); exit; }
 $admin = current_admin();
 ?>
 <h2>Admin Dashboard</h2>

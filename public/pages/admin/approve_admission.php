@@ -1,6 +1,7 @@
 <?php
 require __DIR__ . '/../../../functions.php';
 if (!is_admin_logged_in()){ header('Location:/admin/login'); exit; }
+if (!enforce_session_timeout()) { header('Location:/admin/login'); exit; }
 if ($_SERVER['REQUEST_METHOD']==='POST'){
   if (!verify_csrf($_POST['_csrf'] ?? '')) { die('Invalid CSRF'); }
   $id = intval($_POST['id'] ?? 0);

@@ -55,15 +55,50 @@ function current_student() {
 }
 
 // Simplified file upload validator
-function validate_and_move_upload($file, $targetDir, $allowed = ['pdf','jpg','jpeg','png','mp4'], $maxSize = null) {
-    $maxSize = $maxSize ?? (10 * 1024 * 1024);
+function validate_and_move_upload($file, $subdir = '', $allowed = ['pdf','jpg','jpeg','png','mp4'], $maxSize = null) {
+    $cfg = require __DIR__ . '/config.php';
+    $uploadsBase = rtrim($cfg['uploads_dir'], '/');
+    $maxSize = $maxSize ?? ($cfg['max_upload_size'] ?? (10 * 1024 * 1024));
     if (empty($file) || $file['error'] !== UPLOAD_ERR_OK) return [false, 'File upload error'];
     if ($file['size'] > $maxSize) return [false, 'File too large'];
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
     if (!in_array($ext, $allowed)) return [false, 'Invalid file type'];
     $fname = bin2hex(random_bytes(8)) . '.' . $ext;
+    $targetDir = $uploadsBase . ($subdir ? '/'.trim($subdir, '/') : '');
     if (!is_dir($targetDir)) mkdir($targetDir, 0755, true);
-    $dest = rtrim($targetDir, '/') . '/' . $fname;
+    $dest = $targetDir . '/' . $fname;
     if (!move_uploaded_file($file['tmp_name'], $dest)) return [false, 'Failed to move file'];
-    return [true, $dest];
+    // Return web-accessible path relative to project root
+    $webPath = '/' . trim(str_replace(__DIR__, '', $dest), '/');
+    return [true, $webPath];
+}
+
+// Basic login attempt limiter (session scoped)
+function login_attempt_increment($key) {
+    if (!isset($_SESSION['login_attempts'])) $_SESSION['login_attempts'] = [];
+    if (!isset($_SESSION['login_attempts'][$key])) $_SESSION['login_attempts'][$key] = ['count'=>0,'last'=>time()];
+    $_SESSION['login_attempts'][$key]['count']++;
+    $_SESSION['login_attempts'][$key]['last'] = time();
+}
+
+function login_attempt_allowed($key, $maxAttempts = 5, $blockSeconds = 300) {
+    if (!isset($_SESSION['login_attempts'][$key])) return true;
+    $entry = $_SESSION['login_attempts'][$key];
+    if ($entry['count'] < $maxAttempts) return true;
+    // blocked
+    return (time() - $entry['last']) > $blockSeconds ? true : false;
+}
+
+function login_attempt_reset($key) {
+    if (isset($_SESSION['login_attempts'][$key])) unset($_SESSION['login_attempts'][$key]);
+}
+
+// Session timeout enforcement helper
+function enforce_session_timeout($timeoutSeconds = 1800) {
+    if (empty($_SESSION)) return;
+    if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeoutSeconds) {
+        session_unset(); session_destroy(); return false;
+    }
+    $_SESSION['last_activity'] = time();
+    return true;
 }
