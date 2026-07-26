@@ -21,6 +21,7 @@ $env = load_env(__DIR__ . '/.env');
 return [
     'db' => [
         'host' => $env['DB_HOST'] ?? '127.0.0.1',
+        'port' => intval($env['DB_PORT'] ?? 3306),
         'dbname' => $env['DB_NAME'] ?? 'teaching_website',
         'user' => $env['DB_USER'] ?? 'root',
         'pass' => $env['DB_PASS'] ?? '',

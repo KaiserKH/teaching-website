@@ -2,7 +2,8 @@
 $cfg = require __DIR__ . '/config.php';
 $db = $cfg['db'];
 try {
-    $dsn = "mysql:host={$db['host']};dbname={$db['dbname']};charset={$db['charset']}";
+    $portPart = isset($db['port']) && $db['port'] ? ";port={$db['port']}" : '';
+    $dsn = "mysql:host={$db['host']}{$portPart};dbname={$db['dbname']};charset={$db['charset']}";
     $pdo = new PDO($dsn, $db['user'], $db['pass'], [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
