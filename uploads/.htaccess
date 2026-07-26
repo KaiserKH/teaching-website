@@ -1,0 +1,7 @@
+Options -Indexes
+<FilesMatch "\.(php|phtml|phar|pl|py|jsp|asp|sh)$">
+  Require all denied
+</FilesMatch>
+
+# Prevent script execution via handlers
+SetHandler none

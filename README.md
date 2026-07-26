@@ -104,3 +104,4 @@ Webhooks and admin review
 - `public/api/admin_update_payment.php` — server endpoint used by the admin UI.
 
 After deploying to hosting, run `composer install` in the project root (if your host supports it) or vendor the required libraries.
+# teaching-website
