@@ -178,6 +178,26 @@ CREATE TABLE fees (
   FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Payments (Razorpay / UPI / manual)
+CREATE TABLE payments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id INT,
+  fee_id INT,
+  provider VARCHAR(50),
+  order_id VARCHAR(255),
+  payment_id VARCHAR(255),
+  signature VARCHAR(255),
+  amount DECIMAL(10,2),
+  currency VARCHAR(10) DEFAULT 'INR',
+  status ENUM('created','paid','pending','failed') DEFAULT 'created',
+  receipt VARCHAR(255),
+  screenshot VARCHAR(255),
+  note TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL,
+  FOREIGN KEY (fee_id) REFERENCES fees(id) ON DELETE SET NULL
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- Announcements
 CREATE TABLE announcements (
   id INT AUTO_INCREMENT PRIMARY KEY,

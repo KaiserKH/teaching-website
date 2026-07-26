@@ -1,5 +1,6 @@
 <?php require __DIR__ . '/../../../includes/header.php';
-if (!is_student_logged_in()){ header('Location:/login'); exit; }
+$student_check = is_student_logged_in(); if (!$student_check){ header('Location:/login'); exit; }
+if (!enforce_session_timeout()) { student_logout(); header('Location:/login'); exit; }
 $stu = current_student();
 if ($_SERVER['REQUEST_METHOD']==='POST'){
   if (!verify_csrf($_POST['_csrf'] ?? '')) $error='Invalid CSRF';

@@ -1,5 +1,6 @@
 <?php require __DIR__ . '/../../../includes/header.php';
 if (!is_student_logged_in()){ header('Location:/login'); exit; }
+if (!enforce_session_timeout()) { student_logout(); header('Location:/login'); exit; }
 $student = current_student();
 ?>
 <h2>Welcome, <?php echo e($student['name']); ?></h2>

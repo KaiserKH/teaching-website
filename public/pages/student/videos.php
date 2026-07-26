@@ -1,5 +1,6 @@
 <?php require __DIR__ . '/../../../includes/header.php';
 if (!is_student_logged_in()){ header('Location:/login'); exit; }
+if (!enforce_session_timeout()) { student_logout(); header('Location:/login'); exit; }
 $stu = current_student(); $subject = $stu['subject'];
 $stmt = pdo()->prepare('SELECT * FROM videos WHERE subject_id=? ORDER BY uploaded_at DESC'); $stmt->execute([$subject]); $videos = $stmt->fetchAll();
 ?>

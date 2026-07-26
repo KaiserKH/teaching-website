@@ -1,5 +1,6 @@
 <?php require __DIR__ . '/../../../includes/header.php';
 if (!is_student_logged_in()){ header('Location:/login'); exit; }
+if (!enforce_session_timeout()) { student_logout(); header('Location:/login'); exit; }
 $stu = current_student();
 $sid = $stu['id'];
 $total = pdo()->prepare('SELECT COUNT(*) as c FROM attendance WHERE student_id=?'); $total->execute([$sid]); $total = $total->fetch()['c'] ?: 0;

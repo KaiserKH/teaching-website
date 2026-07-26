@@ -23,6 +23,10 @@ $routes = [
     '/admin/dashboard' => __DIR__ . '/pages/admin/dashboard.php',
     '/admin/admissions' => __DIR__ . '/pages/admin/admissions.php',
     '/admin/approve' => __DIR__ . '/pages/admin/approve_admission.php'
+    ,'/admin/announcements' => __DIR__ . '/pages/admin/announcements.php'
+    ,'/admin/doubts' => __DIR__ . '/pages/admin/doubts.php'
+    ,'/admin/students' => __DIR__ . '/pages/admin/students.php'
+    ,'/admin/fees' => __DIR__ . '/pages/admin/fees.php'
 ];
 
 if (isset($routes[$path])) {

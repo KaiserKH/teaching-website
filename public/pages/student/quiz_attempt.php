@@ -1,5 +1,6 @@
 <?php require __DIR__ . '/../../../functions.php';
 if (!is_student_logged_in()){ header('Location:/login'); exit; }
+if (!enforce_session_timeout()) { student_logout(); header('Location:/login'); exit; }
 $stu = current_student();
 $qid = intval($_GET['id'] ?? 0);
 $stmt = pdo()->prepare('SELECT * FROM quizzes WHERE id=? LIMIT 1'); $stmt->execute([$qid]); $quiz = $stmt->fetch();

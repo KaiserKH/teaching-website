@@ -1,0 +1,9 @@
+{
+  "name": "kaiserkh/teaching-website",
+  "description": "Private tuition website",
+  "require": {
+    "php": ">=7.4",
+    "phpmailer/phpmailer": "^6.8",
+    "razorpay/razorpay": "^2.3"
+  }
+}

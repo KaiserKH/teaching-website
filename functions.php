@@ -102,3 +102,9 @@ function enforce_session_timeout($timeoutSeconds = 1800) {
     $_SESSION['last_activity'] = time();
     return true;
 }
+
+// Simple mail wrapper (can be replaced with PHPMailer later)
+function send_mail($to, $subject, $body, $from = null){
+    require_once __DIR__ . '/lib/mailer.php';
+    return mailer_send($to, $subject, $body, $from);
+}

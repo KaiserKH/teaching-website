@@ -2,10 +2,15 @@
 if ($_SERVER['REQUEST_METHOD']==='POST'){
   if (!verify_csrf($_POST['_csrf'] ?? '')) $error='Invalid CSRF';
   $email = trim($_POST['email'] ?? ''); $pass = $_POST['password'] ?? '';
-  $stmt = pdo()->prepare('SELECT id,password_hash FROM admin WHERE email=? LIMIT 1');
-  $stmt->execute([$email]); $u = $stmt->fetch();
-  if ($u && password_verify($pass,$u['password_hash'])){ admin_login($u['id']); header('Location:/admin/dashboard'); exit; }
-  $error = 'Invalid admin credentials.';
+  $key = 'admin_'.($email?:$_SERVER['REMOTE_ADDR']);
+  if (!login_attempt_allowed($key,5,300)) { $error='Too many attempts. Try again later.'; }
+  else {
+    $stmt = pdo()->prepare('SELECT id,password_hash FROM admin WHERE email=? LIMIT 1');
+    $stmt->execute([$email]); $u = $stmt->fetch();
+    if ($u && password_verify($pass,$u['password_hash'])){ login_attempt_reset($key); admin_login($u['id']); header('Location:/admin/dashboard'); exit; }
+    login_attempt_increment($key);
+    $error = 'Invalid admin credentials.';
+  }
 }
 ?>
 <h2>Admin Login</h2>

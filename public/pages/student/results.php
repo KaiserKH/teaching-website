@@ -1,5 +1,6 @@
 <?php require __DIR__ . '/../../../includes/header.php';
 if (!is_student_logged_in()){ header('Location:/login'); exit; }
+if (!enforce_session_timeout()) { student_logout(); header('Location:/login'); exit; }
 $stu = current_student();
 $quiz_id = intval($_GET['quiz_id'] ?? 0);
 if ($quiz_id){
