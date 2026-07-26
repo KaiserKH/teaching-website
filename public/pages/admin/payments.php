@@ -32,7 +32,7 @@ $payments = $stmt->fetchAll();
       <?php else: ?>
         <em>Processed</em>
       <?php endif; ?>
-        <div style="margin-top:6px;"><a href="/admin/payment_audit?payment_id=<?php echo intval($p['id']); ?>">View history</a></div>
+        <div style="margin-top:6px;"><a href="#" onclick="openAuditModal(<?php echo intval($p['id']); ?>);return false;">View history</a> — <a href="/admin/payment_audit?payment_id=<?php echo intval($p['id']); ?>">full page</a></div>
     </div>
   </div>
 <?php endforeach; ?>
@@ -70,6 +70,39 @@ function showPreview(url){
   document.getElementById('preview-modal').style.display = 'flex';
 }
 function closePreview(){ document.getElementById('preview-modal').style.display = 'none'; }
+</script>
+
+<!-- Audit modal -->
+<div id="audit-modal" style="display:none;position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;z-index:10000;">
+  <div style="background:#fff;padding:12px;max-width:800px;width:90%;max-height:90%;overflow:auto;position:relative;">
+    <button onclick="closeAuditModal()" style="position:absolute;right:8px;top:8px;">Close</button>
+    <div id="audit-content"></div>
+  </div>
+</div>
+
+<script>
+async function openAuditModal(paymentId){
+  const res = await fetch('/api/get_payment_audit.php?payment_id='+encodeURIComponent(paymentId));
+  const data = await res.json();
+  if (data.error) { alert('Error: '+data.error); return; }
+  const out = [];
+  out.push('<h3>Payment '+(data.payment.id||paymentId)+'</h3>');
+  out.push('<div><strong>Student:</strong> '+(data.payment.student_name||'')+' (ID: '+(data.payment.student_id||'')+')</div>');
+  out.push('<div><strong>Amount:</strong> ₹'+(data.payment.amount||'')+' | <strong>Status:</strong> '+(data.payment.status||'')+'</div>');
+  if (data.payment.screenshot) out.push('<div><a href="'+data.payment.screenshot+'" target="_blank">Open screenshot</a></div>');
+  out.push('<h4>Audit</h4>');
+  if (!data.audits || data.audits.length===0) out.push('<div class="card">No audit entries.</div>');
+  else {
+    out.push('<div>');
+    for (const a of data.audits) {
+      out.push('<div class="card"><div><strong>Action:</strong> '+(a.action||'')+' by '+(a.admin_name||'system')+'</div><div><strong>When:</strong> '+(a.created_at||'')+'</div>' + (a.note?'<div><strong>Note:</strong> '+a.note+'</div>':'') + '</div>');
+    }
+    out.push('</div>');
+  }
+  document.getElementById('audit-content').innerHTML = out.join('\n');
+  document.getElementById('audit-modal').style.display = 'flex';
+}
+function closeAuditModal(){ document.getElementById('audit-modal').style.display = 'none'; }
 </script>
 
 <?php require __DIR__ . '/../../../includes/footer.php'; ?>
