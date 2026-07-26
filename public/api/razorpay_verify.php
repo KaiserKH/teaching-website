@@ -26,6 +26,22 @@ try {
     $upd2 = pdo()->prepare('UPDATE fees SET status=?, paid_on=? WHERE id=?');
     $upd2->execute(['paid', date('Y-m-d H:i:s'), $fee_id]);
 
+    // Notify admins about successful payment
+    try {
+        $pstmt = pdo()->prepare('SELECT * FROM payments WHERE order_id=?'); $pstmt->execute([$order_id]); $pay = $pstmt->fetch();
+        $stu = null;
+        if ($pay && $pay['student_id']) {
+            $s = pdo()->prepare('SELECT id,name,email FROM students WHERE id=?'); $s->execute([$pay['student_id']]); $stu = $s->fetch();
+        }
+        $admins = pdo()->query('SELECT name,email FROM admin')->fetchAll();
+        $cfg = require __DIR__ . '/../../config.php';
+        $subject = 'Razorpay payment received';
+        $body = '<p>Payment received via Razorpay.</p>';
+        if ($stu) $body .= '<p><strong>Student:</strong> '.e($stu['name']).' (ID: '.e($stu['id']).')</p>';
+        $body .= '<p><strong>Order ID:</strong> '.e($order_id).' <br><strong>Payment ID:</strong> '.e($payment_id).'</p>';
+        foreach ($admins as $a) { if (!empty($a['email'])) @send_mail($a['email'], $subject, $body, $cfg['mail']['mail_from'] ?? null); }
+    } catch (Exception $e) { error_log('Razorpay notify error: '.$e->getMessage()); }
+
     echo json_encode(['ok'=>true]);
 } catch (Exception $e) {
     echo json_encode(['error'=>'verify_failed','message'=>$e->getMessage()]);

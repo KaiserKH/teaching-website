@@ -97,4 +97,10 @@ Files added:
 - `public/api/razorpay_verify.php` — server endpoint to verify Razorpay payments and mark fees paid.
 - `public/api/upload_upi_payment.php` — endpoint for students to upload UPI screenshots and txn IDs.
 
+Webhooks and admin review
+
+- `public/api/razorpay_webhook.php` — optional webhook endpoint to receive Razorpay events (recommended). Configure this URL in your Razorpay dashboard and set the webhook secret.
+- `public/pages/admin/payments.php` — admin UI to review pending UPI uploads and mark payments as paid/failed manually.
+- `public/api/admin_update_payment.php` — server endpoint used by the admin UI.
+
 After deploying to hosting, run `composer install` in the project root (if your host supports it) or vendor the required libraries.
